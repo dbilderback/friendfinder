@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Friend Finder</title>
+	<!-- Latest compiled and minified CSS & JS -->
+	<link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet">
+	<script src="https://code.jquery.com/jquery.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <div class="jumbotron">
+      <h1 class="text-center"><span class="glyphicon glyphicon-fire"></span> Friend Finder Survey</h1>
+      <hr>
+      <h2 class="text-center">Please answer all the question so we may find you the best possible matches</h2>
+      <br>
+      <form id="home">
+        <div class="row">
+          <div>
+            <label class="col-xs-8 col-sm-8 col-md-8" for="name">What's your name?</label>
+            <input class="col-xs-8 col-sm-8 col-md-8" type="text" id="name">
+					</div>
+					<div>
+            <label class="col-xs-8 col-sm-8 col-md-8" for="image">Put a link here to a photo or drawing of yourself.</label>
+            <input class="col-xs-8 col-sm-8 col-md-8" type="text" id="image">
+          </div>
+          <div class="panel-body" id="questionSection">
+          </div>
+          <input class="button-primary" type="submit" id="submit">
+		    </div>
+      </form>
+    </div>
+
+    <footer class="footer">
+      <div class="container">
+        <p><a href="https://github.com/dbilderback/firendfinder">GitsHub Repo</a></p>
+      </div>
+    </footer>
+
+	</div>
+	<!-- Modal -->
+  <div id="resultsModal" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+	
+				<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h2>Best Match</h2>
+					</div>
+					<div class="modal-body">
+						<h3 id="matchName"></h3>
+						<img id="matchImg" src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/6/005/064/1bd/3435aa3.jpg" alt="">
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+	
+			</div>
+		</div>
+	<script>
+		$(document).ready(function() {
+    getSurveyQuestions();
+    function getSurveyQuestions() {
+
+        // Here we get the location of the root page.
+        // We use this instead of explicitly saying the URL is localhost:3001 because the url will change when we deploy.
+        var currentURL = window.location.origin;
+  
+        // The AJAX function uses the URL of our API to GET the data associated with it (initially set to localhost)
+        $.ajax({ url: currentURL + "/api/friends", method: "GET" })
+        .then(function(questionData) {
+					for (var key in questionData) {
+							console.log(questionData[key]) // "User john is #234"
+							var divContainer = $("<DIV>");
+							var questionLabel = $("<label>").text(questionData[key]);
+							questionLabel.attr("for", key)
+							questionLabel.addClass("col-xs-12 col-sm-12 col-md-12");
+							//questionLabel.html = questionData[0].Question_+i;
+							var questionSelect = $("<select>");
+							questionSelect.attr("id", key);
+							questionSelect.addClass("col-xs-4 col-sm-4 col-md-4");
+							questionSelect.append("<option value='1'>1 Disagree</option>");
+							questionSelect.append("<option value='2'>2 Kinda Disagree</option>");
+							questionSelect.append("<option value='3'>3 Whatever</option>");
+							questionSelect.append("<option value='4'>4 Kinda Agree</option>");
+							questionSelect.append("<option value='5'>5 Kinda Agree</option>");
+							divContainer.append(questionLabel);
+							divContainer.append(questionSelect);
+							$("#questionSection").append(divContainer);
+							//$("#questionSection").append(questionSelect);
+					}
+            // Loop through and display each of the customers
+						for (var i = 1; i < 10; i++) {
+						// Create the HTML Well (Section) and Add the table content for each reserved table
+						//var tempCounter = "Question_"+i.toString();
+						//var currentQuestion = questionData[0].tempCounter;
+						//console.log(questionData[0].tempCounter);
+						//console.log(questionData[0].Question_1);
+						//console.log(currentQuestion);
+            
+          }
+        });
+    }
+    // Getting jQuery references to the html input elements
+    var nameInput = $("#name");
+    var photoInput = $("#image");
+    var homeForm = $("#home");
+    
+    // Adding an event listener for when the form is submitted
+    $(homeForm).on("submit", handleFormSubmit);
+ 
+
+    function handleFormSubmit(event) {
+        event.preventDefault();
+
+        // Wont submit the post if we are missing user inputs
+        if (!nameInput.val().trim() || !photoInput.val().trim()) {
+            return;
+        }
+        // Constructing a newPost object to hand to the database
+        var newEntry = {
+					name: $("#name").val().trim(),
+          photo: $("#image").val().trim(),
+          question1: $("#Question_1").val(),
+					question2: $("#Question_2").val(),
+					question3: $("#Question_3").val(),
+					question4: $("#Question_4").val(),
+					question5: $("#Question_5").val(),
+					question6: $("#Question_6").val(),
+					question7: $("#Question_7").val(),
+					question8: $("#Question_8").val(),
+					question9: $("#Question_9").val(),
+					question10: $("#Question_10").val()
+        };
+				console.log(newEntry.scores);
+        submitEntry(newEntry);
+        
+    }
+    
+        // Submits a new post and brings user to survey page upon completion
+    function submitEntry(entry) {
+        $.post("/api/friends", entry, function(data) {
+						//window.location.href = "/SURVEY";
+						// Grab the result from the AJAX post so that the best match's name and photo are displayed.
+						$("#matchName").text(data.name);
+          	$("#matchImg").attr("src", data.photo);
+          	// Show the modal with the best match
+          	$("#resultsModal").modal("toggle");
+				});
+    }
+});
+	</script>
+
+</body>
+
+</html>
