@@ -22,8 +22,10 @@ app.use(bodyParser.json());
 // Include the route files for the client and server
 // ================================================================================
 
-require("./routes/apiRoutes")(app);
-require("./routes/htmlRoutes")(app);
+require("./app/routes/apiRoutes")(app);
+require("./app/routes/htmlRoutes")(app);
+
+
 
 // =============================================================================
 // LISTENER
